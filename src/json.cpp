@@ -35,11 +35,10 @@
 #include <string.h>
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
-#include <stdarg.h>
 #ifdef snprintf
 #undef snprintf
 #endif
-extern "C" int snprintf(char *, size_t, const char *, ...);
+#define snprintf _snprintf
 #endif
 
 #define out_of_memory() do {                    \
