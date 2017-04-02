@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="GitVersion;Main" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" DefaultTargets="GitVersion;Main" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <LIBSASS_VERSION>[NA]</LIBSASS_VERSION>
     <LIBSASS_SRC_DIR>..\src</LIBSASS_SRC_DIR>
@@ -7,7 +7,7 @@
     <LIBSASS_INCLUDES_DIR>..\include</LIBSASS_INCLUDES_DIR>
   </PropertyGroup>
   <Target Name="GitVersion">
-    <Exec Command="git -C .. describe --abbrev=4 --dirty --always --tags" LogStandardErrorAsError="true" ContinueOnError="true" ConsoleToMSBuild="true">
+    <Exec Command="git describe --abbrev=4 --always --tags" LogStandardErrorAsError="true" ContinueOnError="true" ConsoleToMSBuild="true">
       <Output TaskParameter="ConsoleOutput" PropertyName="LIBSASS_VERSION" />
     </Exec>
   </Target>
@@ -48,6 +48,7 @@
     <ProjectGuid>{E4030474-AFC9-4CC6-BEB6-D846F631502B}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>libsass</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <PropertyGroup Label="Common Properties">
     <TargetName>libsass</TargetName>
@@ -74,17 +75,21 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -104,23 +109,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)bin\Debug\</OutDir>
-    <IntDir>$(SolutionDir)bin\Debug\obj\</IntDir>
+    <OutDir>$(SolutionDir)bin\debug\x86</OutDir>
+    <IntDir>$(SolutionDir)bin\debug\x86\obj\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)bin\Debug\</OutDir>
-    <IntDir>$(SolutionDir)bin\Debug\obj\</IntDir>
+    <OutDir>$(SolutionDir)bin\debug\x64</OutDir>
+    <IntDir>$(SolutionDir)bin\debug\x64\obj\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)bin\</OutDir>
-    <IntDir>$(SolutionDir)bin\obj\</IntDir>
+    <OutDir>$(SolutionDir)bin\release\x86</OutDir>
+    <IntDir>$(SolutionDir)bin\release\x86\obj\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)bin\</OutDir>
-    <IntDir>$(SolutionDir)bin\obj\</IntDir>
+    <OutDir>$(SolutionDir)bin\release\x64</OutDir>
+    <IntDir>$(SolutionDir)bin\release\obj\x64</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
@@ -162,6 +167,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;$(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -179,6 +185,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;$(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

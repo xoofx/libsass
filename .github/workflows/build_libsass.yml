@@ -1,0 +1,86 @@
+name: build_libsass
+
+on:
+  push:
+    branches: [ master ]
+jobs:
+
+  build_ubuntu:
+    runs-on: ubuntu-16.04
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    - name: Build x64
+      run: |
+        export BUILD="shared"
+        make -j5
+
+    - name: Upload x64
+      uses: actions/upload-artifact@v1
+      with:
+        name: libsass_ubuntu_x64
+        path: lib/libsass.so
+
+  build_macos:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    - name: Build x64
+      run: |
+        export BUILD="shared"
+        make -j5
+
+    - name: Upload x64
+      uses: actions/upload-artifact@v1
+      with:
+        name: libsass_macos_x64
+        path: lib/libsass.dylib
+
+  build_windows:
+    runs-on: windows-latest
+    needs: [build_ubuntu, build_macos]
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.0
+
+    - name: Build x86
+      run: msbuild win\libsass.sln /p:Configuration=Release /p:Platform=Win32
+
+    - name: Build x64
+      run: msbuild win\libsass.sln /p:Configuration=Release /p:Platform=Win64
+
+    - name: Download libsass_ubuntu_x64
+      uses: actions/download-artifact@v1
+      with:
+        name: libsass_ubuntu_x64
+
+    - name: Download libsass_macos_x64
+      uses: actions/download-artifact@v1
+      with:
+        name: libsass_macos_x64
+
+    - name: Prepare pack
+      run: |
+        mkdir runtimes\linux-x64\native
+        mkdir runtimes\osx-x64\native
+        mkdir runtimes\win-x86\native
+        mkdir runtimes\win-x64\native
+        copy libsass_ubuntu_x64\libsass.so runtimes\linux-x64\native
+        copy libsass_macos_x64\libsass.dylib runtimes\osx-x64\native
+        copy win\bin\release\x86\libsass.dll runtimes\win-x86\native
+        copy win\bin\release\x64\libsass.dll runtimes\win-x64\native
+
+    - name: Upload libsass binaries
+      uses: actions/upload-artifact@v1
+      with:
+        name: libsass_binaries
+        path: runtimes
