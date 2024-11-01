@@ -9,6 +9,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
     - name: Setup latest Alpine Linux for x86_64
       uses: jirutka/setup-alpine@v1
       with:
