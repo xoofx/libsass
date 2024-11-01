@@ -68,17 +68,33 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Build arm64
       run: |
         export BUILD="shared"
+        make clean
         make -j5
 
     - name: Upload arm64
       uses: actions/upload-artifact@v4
       with:
         name: libsass_macos_arm64
+        path: lib/libsass.dylib
+
+    - name: Build x64
+      run: |
+        export BUILD="shared"
+        export CFLAGS="-Wall -arch x86_64"
+        export CXXFLAGS="-Wall -arch x86_64"
+        export LDFLAGS="-Wall -arch x86_64"
+        make clean
+        make -j5
+
+    - name: Upload x64
+      uses: actions/upload-artifact@v4
+      with:
+        name: libsass_macos_x64
         path: lib/libsass.dylib
 
   build_windows:
@@ -90,7 +106,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.0
+      uses: microsoft/setup-msbuild@v2
 
     - name: Build x86
       run: msbuild win\libsass.sln /p:Configuration=Release /p:Platform=Win32
@@ -119,15 +135,15 @@ jobs:
       with:
         name: libsass_ubuntu_arm64
 
-    - name: Download libsass_macos_x64
-      uses: actions/download-artifact@v4
-      with:
-        name: libsass_macos_x64
-
     - name: Download libsass_macos_arm64
       uses: actions/download-artifact@v4
       with:
         name: libsass_macos_arm64
+
+    - name: Download libsass_macos_x64
+      uses: actions/download-artifact@v4
+      with:
+        name: libsass_macos_x64
 
     - name: Prepare pack
       run: |
