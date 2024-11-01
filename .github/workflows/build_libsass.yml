@@ -5,6 +5,49 @@ on:
     branches: [ master ]
 jobs:
 
+  build_musl:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Setup latest Alpine Linux for x86_64
+      uses: jirutka/setup-alpine@v1
+      with:
+        branch: v3.20
+        shell-name: alpine-x86_64.sh
+
+    - name: Setup latest Alpine Linux for aarch64
+      uses: jirutka/setup-alpine@v1
+      with:
+        arch: aarch64
+        branch: v3.20
+        shell-name: alpine-aarch64.sh
+
+    - name: Build musl-x64
+      run: |
+        export BUILD="shared"
+        make clean
+        make -j5
+      shell: alpine-x86_64.sh {0}
+      
+    - name: Upload musl-x64
+      uses: actions/upload-artifact@v4
+      with:
+        name: libsass_musl_x64
+        path: lib/libsass.so
+
+    - name: Build musl-aarch64
+      run: |
+        export BUILD="shared"
+        make clean
+        make -j5
+      shell: alpine-aarch64.sh {0}
+      
+    - name: Upload musl-arm64
+      uses: actions/upload-artifact@v4
+      with:
+        name: libsass_musl_arm64
+        path: lib/libsass.so
+
   build_ubuntu:
     runs-on: ubuntu-20.04
 
@@ -99,7 +142,7 @@ jobs:
 
   build_windows:
     runs-on: windows-latest
-    needs: [build_ubuntu, build_macos]
+    needs: [build_ubuntu, build_macos, build_musl]
 
     steps:
     - name: Checkout
@@ -125,6 +168,8 @@ jobs:
         mkdir runtimes\linux-x64\native
         mkdir runtimes\linux-arm\native
         mkdir runtimes\linux-arm64\native
+        mkdir runtimes\linux-musl-x64\native
+        mkdir runtimes\linux-musl-arm64\native
         mkdir runtimes\osx-x64\native
         mkdir runtimes\osx-arm64\native
         mkdir runtimes\win-x86\native
@@ -165,6 +210,18 @@ jobs:
       with:
         name: libsass_macos_x64
         path: runtimes\osx-x64\native
+
+    - name: Download libsass_musl_x64
+      uses: actions/download-artifact@v4
+      with:
+        name: libsass_musl_x64
+        path: runtimes\linux-musl-x64\native
+
+    - name: Download libsass_musl_arm64
+      uses: actions/download-artifact@v4
+      with:
+        name: libsass_musl_arm64
+        path: runtimes\linux-musl-arm64\native
 
     - name: List files
       run: |
