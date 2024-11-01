@@ -439,7 +439,7 @@ namespace Sass {
     if (list->is_bracketed()) {
       append_string(lbracket(list));
     }
-    // probably ruby sass eqivalent of element_needs_parens
+    // probably ruby sass equivalent of element_needs_parens
     else if (output_style() == TO_SASS &&
         list->length() == 1 &&
         !list->from_selector() &&
@@ -463,6 +463,7 @@ namespace Sass {
       { sep[0] = i % 2 ? ':' : ','; }
       ExpressionObj list_item = list->at(i);
       if (output_style() != TO_SASS) {
+        if (list_item == nullptr) continue;
         if (list_item->is_invisible()) {
           // this fixes an issue with "" in a list
           if (!Cast<String_Constant>(list_item)) {
@@ -489,7 +490,7 @@ namespace Sass {
       }
       append_string(rbracket(list));
     }
-    // probably ruby sass eqivalent of element_needs_parens
+    // probably ruby sass equivalent of element_needs_parens
     else if (output_style() == TO_SASS &&
         list->length() == 1 &&
         !list->from_selector() &&
@@ -1017,7 +1018,7 @@ namespace Sass {
 
 
     bool was_comma_array = in_comma_array;
-    // probably ruby sass eqivalent of element_needs_parens
+    // probably ruby sass equivalent of element_needs_parens
     if (output_style() == TO_SASS && g->length() == 1 &&
       (!Cast<List>((*g)[0]) &&
         !Cast<SelectorList>((*g)[0]))) {
@@ -1045,7 +1046,7 @@ namespace Sass {
     }
 
     in_comma_array = was_comma_array;
-    // probably ruby sass eqivalent of element_needs_parens
+    // probably ruby sass equivalent of element_needs_parens
     if (output_style() == TO_SASS && g->length() == 1 &&
       (!Cast<List>((*g)[0]) &&
         !Cast<SelectorList>((*g)[0]))) {
@@ -1081,17 +1082,16 @@ namespace Sass {
   void Inspect::operator()(SelectorComponent* sel)
   {
     // You should probably never call this method directly
-    // But in case anyone does, we will do the upcasting
+    // But in case anyone does, we will do the up-casting
     if (auto comp = Cast<CompoundSelector>(sel)) operator()(comp);
     if (auto comb = Cast<SelectorCombinator>(sel)) operator()(comb);
   }
 
   void Inspect::operator()(CompoundSelector* sel)
   {
-    if (sel->hasRealParent()) {
+    if (sel->hasRealParent() /* || sel->has_real_parent_ref() */) {
       append_string("&");
     }
-    sel->sortChildren();
     for (auto& item : sel->elements()) {
       item->perform(this);
     }

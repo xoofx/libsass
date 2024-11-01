@@ -433,6 +433,16 @@ namespace Sass {
     return false;
   }
 
+  bool ComplexSelector::isInvalidCss() const
+  {
+    for (size_t i = 0; i < length(); i += 1) {
+      if (CompoundSelectorObj compound = get(i)->getCompound()) {
+        if (compound->isInvalidCss()) return true;
+      }
+    }
+    return false;
+  }
+
   SelectorListObj ComplexSelector::wrapInList()
   {
     SelectorListObj selector =
@@ -525,15 +535,13 @@ namespace Sass {
   CompoundSelector::CompoundSelector(SourceSpan pstate, bool postLineBreak)
     : SelectorComponent(pstate, postLineBreak),
       Vectorized<SimpleSelectorObj>(),
-      hasRealParent_(false),
-      extended_(false)
+      hasRealParent_(false)
   {
   }
   CompoundSelector::CompoundSelector(const CompoundSelector* ptr)
     : SelectorComponent(ptr),
       Vectorized<SimpleSelectorObj>(*ptr),
-      hasRealParent_(ptr->hasRealParent()),
-      extended_(ptr->extended())
+      hasRealParent_(ptr->hasRealParent())
   { }
 
   size_t CompoundSelector::hash() const
@@ -860,7 +868,7 @@ namespace Sass {
     for (SimpleSelectorObj simple : elements()) {
       if (PseudoSelector * pseudo = Cast<PseudoSelector>(simple)) {
         if (SelectorList* sel = Cast<SelectorList>(pseudo->selector())) {
-          if (parent) {
+          if (parent && !parent->has_real_parent_ref()) {
             pseudo->selector(sel->resolve_parent_refs(
               pstack, traces, implicit_parent));
           }
@@ -950,21 +958,40 @@ namespace Sass {
     std::sort(begin(), end(), cmpSimpleSelectors);
   }
 
+  bool CompoundSelector::isInvalidCss() const
+  {
+    size_t current = 0, next = 0;
+    for (const SimpleSelector* sel : elements()) {
+      next = sel->getSortOrder();
+      // Must only have one type selector
+      if (current == 1 && next == 1) {
+        return true;
+      }
+      if (next < current) {
+        return true;
+      }
+      current = next;
+    }
+    return false;
+  }
+
   /* better return sass::vector? only - is empty container anyway? */
-  SelectorList* ComplexSelector::resolve_parent_refs(SelectorStack pstack, Backtraces& traces, bool implicit_parent)
+  SelectorList* ComplexSelector::resolve_parent_refs(
+    SelectorStack pstack, Backtraces& traces, bool implicit_parent)
   {
 
     sass::vector<sass::vector<ComplexSelectorObj>> vars;
 
     auto parent = pstack.back();
+    auto hasRealParent = has_real_parent_ref();
 
-    if (has_real_parent_ref() && !parent) {
+    if (hasRealParent && !parent) {
       throw Exception::TopLevelParent(traces, pstate());
     }
 
     if (!chroots() && parent) {
 
-      if (!has_real_parent_ref() && !implicit_parent) {
+      if (!hasRealParent && !implicit_parent) {
         SelectorList* retval = SASS_MEMORY_NEW(SelectorList, pstate(), 1);
         retval->append(this);
         return retval;
@@ -995,10 +1022,10 @@ namespace Sass {
     for (auto items : res) {
       if (items.size() > 0) {
         ComplexSelectorObj first = SASS_MEMORY_COPY(items[0]);
-        first->hasPreLineFeed(first->hasPreLineFeed() || (!has_real_parent_ref() && hasPreLineFeed()));
+        first->hasPreLineFeed(first->hasPreLineFeed() || (!hasRealParent && hasPreLineFeed()));
         // ToDo: remove once we know how to handle line feeds
         // ToDo: currently a mashup between ruby and dart sass
-        // if (has_real_parent_ref()) first->has_line_feed(false);
+        // if (hasRealParent) first->has_line_feed(false);
         // first->has_line_break(first->has_line_break() || has_line_break());
         first->chroots(true); // has been resolved by now
         for (size_t i = 1; i < items.size(); i += 1) {

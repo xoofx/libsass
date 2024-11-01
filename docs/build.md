@@ -33,6 +33,20 @@ Since `libsass` is a library, it makes sense to install it as a shared library o
 
 - [Building shared system library][4]
 
+### Building from vcpkg
+
+The libsass port in [vcpkg][12] is kept up to date by Microsoft team members and community contributors. You can download and install libsass using the vcpkg dependency manager:
+
+```bash
+git clone https://github.com/Microsoft/vcpkg.git
+cd vcpkg
+./bootstrap-vcpkg.sh  # ./bootstrap-vcpkg.bat for Windows
+./vcpkg integrate install
+./vcpkg install libsass
+```
+
+If the version is out of date, please [create an issue or pull request][12] on the vcpkg repository.
+
 Compiling with clang instead of gcc
 --
 
@@ -69,10 +83,10 @@ Continuous Integration
 
 We use two CI services to automatically test all commits against the latest [spec test-suite][5].
 
-- [LibSass on Travis-CI (linux)][7]
-[![Build Status](https://travis-ci.org/sass/libsass.png?branch=master)](https://travis-ci.org/sass/libsass)
+- [LibSass on GitHub Actions (linux)][7]
+[![Build Status](https://github.com/sass/libsass/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/sass/libsass/actions/workflows/build-and-test.yml)
 - [LibSass on AppVeyor (windows)][8]
-[![Build status](https://ci.appveyor.com/api/projects/status/github/sass/libsass?svg=true)](https://ci.appveyor.com/project/mgreter/libsass-513/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/github/sass/libsass?svg=true)](https://ci.appveyor.com/project/sass/libsass/branch/master)
 
 Why not using CMake?
 --
@@ -90,8 +104,9 @@ Miscellaneous
 [4]: build-shared-library.md
 [5]: https://github.com/sass/sass-spec
 [6]: https://github.com/sass/sassc
-[7]: https://github.com/sass/libsass/blob/master/.travis.yml
+[7]: https://github.com/sass/libsass/blob/master/.github/workflows
 [8]: https://github.com/sass/libsass/blob/master/appveyor.yml
 [9]: implementations.md
 [10]: build-on-darwin.md
 [11]: build-with-visual-studio.md
+[12]: https://github.com/Microsoft/vcpkg
