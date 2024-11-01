@@ -120,36 +120,7 @@ jobs:
     - name: Build ARM64
       run: msbuild win\libsass.sln /p:Configuration=Release /p:Platform=ARM64
 
-    - name: Download libsass_ubuntu_x64
-      uses: actions/download-artifact@v4
-      with:
-        name: libsass_ubuntu_x64
-
-    - name: Download libsass_ubuntu_arm
-      uses: actions/download-artifact@v4
-      with:
-        name: libsass_ubuntu_arm
-
-    - name: Download libsass_ubuntu_arm64
-      uses: actions/download-artifact@v4
-      with:
-        name: libsass_ubuntu_arm64
-
-    - name: Download libsass_macos_arm64
-      uses: actions/download-artifact@v4
-      with:
-        name: libsass_macos_arm64
-
-    - name: Download libsass_macos_x64
-      uses: actions/download-artifact@v4
-      with:
-        name: libsass_macos_x64
-
-    - name: List files
-      run: |
-        ls -R
-
-    - name: Prepare pack
+    - name: Create runtimes directory and copy Windows binaries
       run: |
         mkdir runtimes\linux-x64\native
         mkdir runtimes\linux-arm\native
@@ -160,15 +131,44 @@ jobs:
         mkdir runtimes\win-x64\native
         mkdir runtimes\win-arm\native
         mkdir runtimes\win-arm64\native
-        copy libsass_ubuntu_x64\libsass.so runtimes\linux-x64\native
-        copy libsass_ubuntu_arm\libsass.so runtimes\linux-arm\native
-        copy libsass_ubuntu_arm64\libsass.so runtimes\linux-arm64\native
-        copy libsass_macos_x64\libsass.dylib runtimes\osx-x64\native
-        copy libsass_macos_arm64\libsass.dylib runtimes\osx-arm64\native
         copy win\bin\release\x86\libsass.dll runtimes\win-x86\native
         copy win\bin\release\x64\libsass.dll runtimes\win-x64\native
         copy win\bin\release\arm\libsass.dll runtimes\win-arm\native
         copy win\bin\release\arm64\libsass.dll runtimes\win-arm64\native
+
+    - name: Download libsass_ubuntu_x64
+      uses: actions/download-artifact@v4
+      with:
+        name: libsass_ubuntu_x64
+        path: runtimes\linux-x64\native
+
+    - name: Download libsass_ubuntu_arm
+      uses: actions/download-artifact@v4
+      with:
+        name: libsass_ubuntu_arm
+        path: runtimes\linux-arm\native
+
+    - name: Download libsass_ubuntu_arm64
+      uses: actions/download-artifact@v4
+      with:
+        name: libsass_ubuntu_arm64
+        path: runtimes\linux-arm64\native
+
+    - name: Download libsass_macos_arm64
+      uses: actions/download-artifact@v4
+      with:
+        name: libsass_macos_arm64
+        path: runtimes\osx-arm64\native
+
+    - name: Download libsass_macos_x64
+      uses: actions/download-artifact@v4
+      with:
+        name: libsass_macos_x64
+        path: runtimes\osx-x64\native
+
+    - name: List files
+      run: |
+        ls -R runtimes
 
     - name: Upload libsass binaries
       uses: actions/upload-artifact@v4
