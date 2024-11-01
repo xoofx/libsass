@@ -13,13 +13,18 @@ jobs:
       uses: jirutka/setup-alpine@v1
       with:
         branch: v3.20
+        arch: x86_64
+        packages: >
+          build-base
         shell-name: alpine-x86_64.sh
 
     - name: Setup latest Alpine Linux for aarch64
       uses: jirutka/setup-alpine@v1
       with:
-        arch: aarch64
         branch: v3.20
+        arch: aarch64
+        packages: >
+          build-base
         shell-name: alpine-aarch64.sh
 
     - name: Build musl-x64
