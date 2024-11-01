@@ -6,11 +6,11 @@ on:
 jobs:
 
   build_ubuntu:
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-20.04
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v1
+      uses: actions/checkout@v4
 
     - name: Build x64
       run: |
@@ -18,7 +18,7 @@ jobs:
         make -j5
 
     - name: Upload x64
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: libsass_ubuntu_x64
         path: lib/libsass.so
@@ -28,17 +28,17 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v1
+      uses: actions/checkout@v3
 
-    - name: Build x64
+    - name: Build arm64
       run: |
         export BUILD="shared"
         make -j5
 
-    - name: Upload x64
-      uses: actions/upload-artifact@v1
+    - name: Upload arm64
+      uses: actions/upload-artifact@v4
       with:
-        name: libsass_macos_x64
+        name: libsass_macos_arm64
         path: lib/libsass.dylib
 
   build_windows:
@@ -47,7 +47,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v1
+      uses: actions/checkout@v4
 
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.0
@@ -58,13 +58,19 @@ jobs:
     - name: Build x64
       run: msbuild win\libsass.sln /p:Configuration=Release /p:Platform=Win64
 
+    - name: Build ARM
+      run: msbuild win\libsass.sln /p:Configuration=Release /p:Platform=ARM
+
+    - name: Build ARM64
+      run: msbuild win\libsass.sln /p:Configuration=Release /p:Platform=ARM64
+
     - name: Download libsass_ubuntu_x64
-      uses: actions/download-artifact@v1
+      uses: actions/download-artifact@v4
       with:
         name: libsass_ubuntu_x64
 
     - name: Download libsass_macos_x64
-      uses: actions/download-artifact@v1
+      uses: actions/download-artifact@v4
       with:
         name: libsass_macos_x64
 
@@ -75,12 +81,14 @@ jobs:
         mkdir runtimes\win-x86\native
         mkdir runtimes\win-x64\native
         copy libsass_ubuntu_x64\libsass.so runtimes\linux-x64\native
-        copy libsass_macos_x64\libsass.dylib runtimes\osx-x64\native
+        copy libsass_macos_arm64\libsass.dylib runtimes\osx-arm64\native
         copy win\bin\release\x86\libsass.dll runtimes\win-x86\native
         copy win\bin\release\x64\libsass.dll runtimes\win-x64\native
+        copy win\bin\release\arm\libsass.dll runtimes\win-arm\native
+        copy win\bin\release\arm64\libsass.dll runtimes\win-arm64\native
 
     - name: Upload libsass binaries
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: libsass_binaries
         path: runtimes
